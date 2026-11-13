@@ -11,6 +11,11 @@ import { chromium, webkit } from 'playwright-core';
 
 const exec = promisify(execFile);
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const args = process.argv.slice(2);
+if (args.length > 1 || (args.length === 1 && args[0] !== '--registry')) {
+  throw new Error('Usage: node scripts/test-install.js [--registry]');
+}
+const registry = args[0] === '--registry';
 const scratch = await mkdtemp(join(tmpdir(), 'shadows-ink-install-'));
 const consumer = join(scratch, 'consumer');
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
@@ -91,13 +96,16 @@ async function screenshotColors(page) {
 
 try {
   const metadata = JSON.parse(await readFile(join(packageRoot, 'package.json'), 'utf8'));
-  await runNpm(['pack', '--silent', '--pack-destination', scratch], packageRoot);
-  const archives = (await readdir(scratch)).filter(name => name.endsWith('.tgz'));
-  assert.equal(archives.length, 1, 'npm pack must produce one installable archive');
-  const archive = join(scratch, archives[0]);
+  let installTarget = `${metadata.name}@${metadata.version}`;
+  if (!registry) {
+    await runNpm(['pack', '--silent', '--pack-destination', scratch], packageRoot);
+    const archives = (await readdir(scratch)).filter(name => name.endsWith('.tgz'));
+    assert.equal(archives.length, 1, 'npm pack must produce one installable archive');
+    installTarget = join(scratch, archives[0]);
+  }
   await mkdir(consumer);
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ name: 'shadows-ink-install-consumer', private: true, type: 'module' }));
-  await runNpm(['install', '--offline', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false', archive], consumer);
+  await runNpm(['install', ...(registry ? ['--registry=https://registry.npmjs.org/'] : ['--offline']), '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false', installTarget], consumer);
   const installedPath = join(consumer, 'node_modules', 'shadows.ink');
   const installedStat = await lstat(installedPath);
   assert.ok(installedStat.isDirectory() && !installedStat.isSymbolicLink(), 'npm must unpack the tarball into an actual directory');
@@ -187,7 +195,7 @@ try {
     } finally { await browser.close(); }
   }
   assert.ok(tested > 0, 'Install a Playwright Chromium or WebKit browser before running test:install');
-  console.log(`PASS npm pack/install and npm exec shadows-ink --version (${metadata.version})`);
+  console.log(`PASS npm ${registry ? 'registry install' : 'pack/install'} and npm exec shadows-ink --version (${metadata.version})`);
 } finally {
   if (server) {
     server.closeAllConnections();
