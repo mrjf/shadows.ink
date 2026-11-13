@@ -1,0 +1,63 @@
+{
+  "name": "shadows.ink",
+  "version": "0.1.0",
+  "description": "Sun-aware physical shadows for web text, images, and shapes, with a cursor light on desktop.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js",
+      "default": "./src/index.js"
+    },
+    "./render": "./src/render.js",
+    "./physics": "./src/physics.js"
+  },
+  "bin": {
+    "shadows-ink": "./bin/shadows-ink.js"
+  },
+  "files": [
+    "src",
+    "bin",
+    "website",
+    "README.md",
+    "LICENSE",
+    "NOTICE.md"
+  ],
+  "scripts": {
+    "build": "node scripts/build-site.js",
+    "dev": "npm run build && node bin/shadows-ink.js demo",
+    "test": "node --test test/*.test.js",
+    "prepack": "npm run build",
+    "test:install": "node scripts/test-install.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrjf/shadows.ink.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mrjf/shadows.ink/issues"
+  },
+  "homepage": "https://sun-shadow-russ.mrjfgh.chatgpt.site/",
+  "keywords": [
+    "shadow",
+    "sun",
+    "webgl",
+    "device-orientation",
+    "typography",
+    "solar",
+    "cursor"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.63.0"
+  }
+}

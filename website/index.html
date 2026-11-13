@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f2ec">
+  <meta name="description" content="Sunlight on a little piece of history. A live shadow experiment for text and images.">
+  <title>Shadows.ink — Men Walk on Moon</title>
+  <link rel="icon" href="./sun.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main id="shadow-page">
+    <canvas id="scene" aria-hidden="true"></canvas>
+    <section id="stage" class="stage" aria-label="Moon landing article with sunlight shadows">
+      <article class="newspaper" aria-labelledby="lettering">
+        <h1 id="lettering" class="shadows-ink">MEN WALK<br>ON MOON</h1>
+        <figure>
+          <img id="moon-photo" src="./moon.jpg" alt="Neil Armstrong beside Eagle’s ladder after his first step on the Moon, in the television photograph printed on the Times front page" width="461" height="348" draggable="false" class="shadows-ink">
+          <figcaption class="shadows-ink"><span>Armstrong after his first step · Live TV</span><a href="https://assets.moma.org/documents/moma_catalogue_289_300063164.pdf#page=23" title="Original front-page photograph, reproduced in MoMA’s Pictures of the Times, page 18" target="_blank" rel="noreferrer">Original</a></figcaption>
+        </figure>
+        <div class="story">
+          <time class="dateline shadows-ink" datetime="1969-07-21">July 21, 1969</time>
+          <p class="article-copy shadows-ink">Neil Armstrong and Edwin Aldrin landed in the Sea of Tranquility and became the first people to walk on the Moon. They explored its powdery surface, gathered samples and planted an American flag while Michael Collins orbited above in Columbia.</p>
+        </div>
+      </article>
+    </section>
+    <aside class="workbench" aria-label="About and shadow controls">
+      <div class="intro">
+        <h2 class="shadows-ink">Shadows.ink</h2>
+        <p id="about" class="shadows-ink">Real sunlight. Shadows from every word and image.</p>
+        <p class="source-note shadows-ink">Condensed from John Noble Wilford’s <a href="https://timesmachine.nytimes.com/timesmachine/1969/07/21/issue.html" target="_blank" rel="noreferrer">report, July 21, 1969 ↗</a></p>
+      </div>
+      <div class="setup">
+        <div id="mode" class="mode shadows-ink"></div>
+        <p id="status" role="status" aria-live="polite" class="shadows-ink"></p>
+        <button id="start" type="button" hidden class="shadows-ink">Set up sunlight</button>
+        <button id="calibrate" type="button" hidden class="shadows-ink">Set compass</button>
+        <a id="secure-link" href="https://sun-shadow-russ.mrjfgh.chatgpt.site/" hidden class="shadows-ink">Open the secure site</a>
+      </div>
+      <button id="settings-open" class="settings-open" type="button" aria-label="Shadow settings"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg><span class="shadows-ink">Adjust shadow</span></button>
+    </aside>
+    <dialog id="settings" aria-labelledby="settings-title">
+      <div class="dialog-header"><h2 id="settings-title">Shadow</h2><button id="settings-close" type="button" aria-label="Close settings">✕</button></div>
+      <label for="height">Gap above the surface <output id="height-value">0 mm</output></label>
+      <input id="height" type="range" min="0" max="40" step="0.1" value="0" aria-describedby="geometry-note">
+      <label for="thickness">Element thickness <output id="thickness-value">0.2 mm</output></label>
+      <input id="thickness" type="range" min="0" max="10" step="0.1" value="0.2" aria-describedby="geometry-note">
+      <p id="geometry-note" class="hint">Both at 0 mm: no cast shadow.</p>
+      <label for="surface">Shadow texture <select id="surface"><option value="smooth">None</option><option value="concrete">Concrete</option><option value="glass">Rippled glass</option><option value="wood">Wood grain</option><option value="graph">Graph paper</option></select></label>
+      <div class="scale-setting"><span id="scale-status" class="hint">Estimated scale</span><button id="scale-open" type="button">Calibrate millimeters</button></div>
+      <div class="settings-actions"><button id="align" type="button" hidden>Align to the sun</button><button id="stop" type="button" hidden>Stop sensors</button></div>
+    </dialog>
+    <dialog id="scale-settings" aria-labelledby="scale-title">
+      <div class="dialog-header"><h2 id="scale-title">Screen scale</h2><button id="scale-close" type="button" aria-label="Cancel calibration">✕</button></div>
+      <p class="hint" id="scale-help">Hold a ruler to the line. Adjust until it measures 30 mm.</p>
+      <div class="ruler-space" aria-hidden="true"><div id="scale-ruler"></div></div>
+      <label for="screen-scale">Match the line to 30 mm</label>
+      <input id="screen-scale" type="range" min="2" max="8" step="0.01" value="3.78" aria-describedby="scale-help" aria-valuetext="Adjust the line to measure 30 millimeters">
+      <button id="scale-done" type="button">Done</button>
+    </dialog>
+    <noscript>Turn on JavaScript in your browser to use Shadows.ink.</noscript>
+  </main>
+  <footer class="project-links"><a href="https://github.com/mrjf/shadows.ink" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a></footer>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

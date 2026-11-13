@@ -1,0 +1,6 @@
+node_modules/
+*.tgz
+.DS_Store
+website/shadows.js
+website/render.js
+website/physics.js
