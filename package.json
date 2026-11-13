@@ -15,7 +15,7 @@
     "./physics": "./src/physics.js"
   },
   "bin": {
-    "shadows-ink": "./bin/shadows-ink.js"
+    "shadows-ink": "bin/shadows-ink.js"
   },
   "files": [
     "src",
