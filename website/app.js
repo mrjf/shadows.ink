@@ -4,7 +4,8 @@ import conf from './shadows.config.js';
 const $ = id => document.getElementById(id);
 const mobile = isMobileDevice();
 document.body.dataset.device = mobile ? 'mobile' : 'desktop';
-if (!mobile) $('about').textContent = 'Move your cursor. Every word and image casts a shadow.';
+showDesktopControls();
+function showDesktopControls() { $('sun-control').hidden = mobile; }
 let pixelsPerMm = conf.pixelsPerMm, calibrationDpr = devicePixelRatio;
 const viewportZoom = () => window.visualViewport?.scale ?? 1;
 const text = (id, value) => { if ($(id).textContent !== value) $(id).textContent = value; };
@@ -12,11 +13,12 @@ const show = (id, visible) => { if ($(id).hidden === visible) $(id).hidden = !vi
 
 const shadows = createShadows($('shadow-page'), {
   ...conf,
+  mode: mobile ? 'auto' : 'manual',
   canvas: $('scene'),
-  transparent: false,
+  transparent: true,
   onStatus(status) {
-    text('mode', status.label);
-    text('status', status.mode === 'cursor' ? 'Try on mobile for the true sun angle.' : status.message);
+    text('mode', mobile ? status.label : 'Directional sunlight');
+    text('status', mobile ? status.message : 'Try on mobile for the true sun angle.');
     show('start', status.action === 'start' || status.action === 'retry');
     if (status.action === 'start' || status.action === 'retry') text('start', status.actionLabel);
     show('calibrate', status.action === 'calibrate');
@@ -76,3 +78,51 @@ window.addEventListener('resize', () => {
   text('scale-status', 'Estimated scale'); shadows.setOptions({ pixelsPerMm });
 });
 window.visualViewport?.addEventListener('resize', updateScaleRuler);
+
+let azimuth = -Math.PI / 4, elevation = 35, vectorStart = null;
+function applySunVector() {
+  const h = elevation * Math.PI / 180;
+  shadows.setLight({ direction: [-Math.cos(azimuth) * Math.cos(h), Math.sin(azimuth) * Math.cos(h), Math.sin(h)], daylight: true });
+  $('sun-angle').value = String(elevation);
+  text('sun-angle-value', `${Math.round(elevation)}°`);
+  $('sun-angle').setAttribute('aria-valuetext', `${Math.round(elevation)} degrees above the page`);
+  // The preview arrow points along the incoming ray, opposite the direction to the sun.
+  $('direction-arrow').setAttribute('transform', `rotate(${azimuth * 180 / Math.PI - 45} 40 40)`);
+}
+if (!mobile) {
+  azimuth = Math.PI / 4;
+  applySunVector();
+  $('sun-angle').addEventListener('input', () => { elevation = Number($('sun-angle').value); applySunVector(); });
+  $('vector-reset').addEventListener('click', () => { azimuth = Math.PI / 4; elevation = 35; applySunVector(); });
+  window.addEventListener('pointerdown', event => {
+    if (event.button !== 0 || event.pointerType === 'touch' || event.target.closest('button, input, select, a, dialog') || document.querySelector('dialog[open]')) return;
+    event.preventDefault();
+    vectorStart = { x: event.clientX, y: event.clientY, id: event.pointerId };
+    document.body.setPointerCapture(event.pointerId);
+    document.body.dataset.drawing = 'true';
+    const ray = $('sun-ray'), origin = $('sun-origin');
+    ray.setAttribute('x1', event.clientX); ray.setAttribute('y1', event.clientY);
+    ray.setAttribute('x2', event.clientX); ray.setAttribute('y2', event.clientY);
+    origin.setAttribute('cx', event.clientX); origin.setAttribute('cy', event.clientY);
+    $('sun-vector-angle').setAttribute('x', event.clientX + 16); $('sun-vector-angle').setAttribute('y', event.clientY - 16);
+    text('sun-vector-angle', 'Drag to set the angle');
+    $('sun-vector').removeAttribute('hidden');
+  });
+  window.addEventListener('pointermove', event => {
+    if (!vectorStart || event.pointerId !== vectorStart.id) return;
+    const dx = event.clientX - vectorStart.x, dy = event.clientY - vectorStart.y, length = Math.hypot(dx, dy);
+    $('sun-ray').setAttribute('x2', event.clientX); $('sun-ray').setAttribute('y2', event.clientY);
+    if (length < 8) return;
+    azimuth = Math.atan2(dy, dx);
+    elevation = Math.max(8, Math.min(80, Math.atan2(20 * pixelsPerMm / viewportZoom(), length) * 180 / Math.PI));
+    applySunVector(); text('sun-vector-angle', `${Math.round(elevation)}°`);
+  });
+  const finish = event => {
+    if (!vectorStart || event.pointerId !== vectorStart.id) return;
+    if (document.body.hasPointerCapture(event.pointerId)) document.body.releasePointerCapture(event.pointerId);
+    vectorStart = null; delete document.body.dataset.drawing; $('sun-vector').setAttribute('hidden', '');
+  };
+  window.addEventListener('pointerup', finish);
+  window.addEventListener('pointercancel', finish);
+  document.body.addEventListener('lostpointercapture', finish);
+}

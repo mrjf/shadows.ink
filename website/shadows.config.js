@@ -1,7 +1,7 @@
 export default {
   selector: '.shadows-ink',
   mode: 'auto',
-  gapMm: 0,
+  gapMm: 0.8,
   thicknessMm: 0.2,
   pixelsPerMm: 96 / 25.4,
   material: 'smooth',

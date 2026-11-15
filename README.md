@@ -1,6 +1,6 @@
 # shadows.ink
 
-Physical shadows for web text, images, and shapes. Move the cursor on desktop; on a phone, use location and orientation to follow the real sun.
+Physical shadows for web text, images, and shapes. The demo lets you press and drag to draw a sunlight vector, then release to hold it. On a phone, location and orientation follow the real sun.
 
 [Live demo](https://sun-shadow-russ.mrjfgh.chatgpt.site/) · [Source](https://github.com/mrjf/shadows.ink)
 
@@ -24,6 +24,8 @@ cd my-shadow-site
 npm install
 npx shadows.ink serve .
 ```
+
+The demo puts only the newspaper article in the desktop phone frame, with controls outside. Its paper stays light cream: a transparent layer draws shadows without illuminating the page. A longer drawn vector lowers the sun angle and lengthens the shadows; the angle slider adjusts it directly.
 
 The CLI prints a localhost URL. To use phone sensors, publish the static files to an HTTPS host and open the page directly on your phone.
 
